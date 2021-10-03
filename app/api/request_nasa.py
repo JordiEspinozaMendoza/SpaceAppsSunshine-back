@@ -8,7 +8,7 @@ API_URL = os.getenv('API_URL')
 class NasaInfo:
     def __init__(self, received_data):
         self.received_data = received_data
-        graph_type = ''
+        self.graph_types = ['ALLSKY_SFC_SW_DWN', 'ALLSKY_SFC_SW_DWN']
         #formated_data = format_data(received_data)
 
 
@@ -28,11 +28,12 @@ class NasaInfo:
 
 
     def return_data_from_nasa(self):
-        data_type = 'ALLSKY_SFC_SW_DWN'
+        final_data = []
 
-        #bucle
-        raw_data = self.request_data(data_type)
+        for graph_type in self.graph_types:
+            raw_data = self.request_data(graph_type)
             # formatear raw_data
             # una vez formateado -> lo añado a un array
+            final_data.append(raw_data)
         
-        return raw_data
+        return final_data

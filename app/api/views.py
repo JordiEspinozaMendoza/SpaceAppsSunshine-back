@@ -18,7 +18,6 @@ def request_info_nasa(request):
 
 
 def receive_info_from_front(request):
-    endpoint = 'api/temporal/monthly/point'
     body = request.GET
 
     received_data = {
@@ -31,6 +30,9 @@ def receive_info_from_front(request):
     }
 
     NasaInfo = request_nasa.NasaInfo(received_data)
-    final_data = NasaInfo.return_data_from_nasa()
+    data = NasaInfo.return_data_from_nasa()
+    final_data = {
+        'data': data,
+    }
 
     return JsonResponse(final_data)
