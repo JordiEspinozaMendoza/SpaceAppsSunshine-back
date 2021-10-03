@@ -9,7 +9,6 @@ class NasaInfo:
     def __init__(self, received_data):
         self.received_data = received_data
         self.graph_types = ['ALLSKY_SFC_SW_DWN', 'ALLSKY_SFC_SW_DWN']
-        #formated_data = format_data(received_data)
 
 
     def request_data(self, data_type):
@@ -32,8 +31,17 @@ class NasaInfo:
 
         for graph_type in self.graph_types:
             raw_data = self.request_data(graph_type)
-            # formatear raw_data
-            # una vez formateado -> lo añado a un array
-            final_data.append(raw_data)
+            formatted_data = {
+                graph_type: FormatData(raw_data).__dict__
+            }
+            final_data.append(formatted_data)
         
         return final_data
+
+
+class FormatData:
+    def __init__(self, graph_raw):
+        self.monthly_values = []
+        self.anual_avg = 0
+        self.title = ''
+        self.unit_values = ''
