@@ -9,10 +9,10 @@ API_URL = os.getenv('API_URL')
 
 
 class NasaInfo:
-    def __init__(self, received_data, api_resolution):
+    def __init__(self, received_data, api_resolution, parameters):
         self.received_data = received_data
         self.api_resolution = api_resolution
-        self.graph_types = ['ALLSKY_SFC_SW_DWN', 'ALLSKY_SFC_SW_DWN']
+        self.graph_types = parameters['values']
 
     def request_data(self, data_type):
         endpoint = f'/api/temporal/{self.api_resolution}/point'
@@ -23,9 +23,7 @@ class NasaInfo:
             API_URL + endpoint,
             params=body
         )
-
         api_response = r.json()
-
         return api_response
 
     def return_data_from_nasa(self):
@@ -130,7 +128,7 @@ class Parameters():
             'community': 'sb',
             'temporal': resolution,
         }
-        print(API_URL + endpoint)
+
         r = requests.get(
             API_URL + endpoint,
             params=body
@@ -140,8 +138,7 @@ class Parameters():
 
         resolve = []
         for parameter in api_response:
-            print(parameter)
-            if api_response.get(parameter).get('type') == type:
+            if '_SD' not in parameter and '_MAX' not in parameter and '_MIN' not in parameter and '_HR' not in parameter and '_0' not in parameter and '_1' not in parameter and '_2' not in parameter and api_response.get(parameter).get('type') == type and ('Irradiance' in api_response.get(parameter).get('name')):
                 resolve.append(parameter)
 
         return resolve

@@ -36,9 +36,10 @@ def receive_info_from_front(request):
     elif resolution == 'weekly':
         resolution = 'daily'
 
-    NasaParameters = request_nasa.Parameters('RADIATION', resolution)
-
-    NasaInfo = request_nasa.NasaInfo(received_data, resolution)
+    NasaInfo = request_nasa.NasaInfo(
+        received_data, resolution,
+        request_nasa.Parameters('RADIATION', resolution).__dict__
+    )
 
     if NasaInfo.is_fail():
         return JsonResponse({'message': 'error'}, status=500)
