@@ -12,7 +12,15 @@ class NasaInfo:
 
 
     def request_data(self, data_type):
-        endpoint = 'api/temporal/monthly/point'
+        resolution = self.received_data.get('resolution')
+        
+        if resolution == 'yearly':
+            resolution = 'monthly'
+        elif resolution == 'weekly':
+            resolution = 'daily'
+
+        endpoint = f'api/temporal/{resolution}/point'
+
         body = self.received_data
         body['parameters'] = data_type
 
