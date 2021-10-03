@@ -1,3 +1,4 @@
+from typing import final
 import requests
 import os
 import sys
@@ -30,17 +31,25 @@ class NasaInfo:
         return api_response
 
     def return_data_from_nasa(self):
-        final_data = []
+        
+        return_data = []
+        for type in self.graph_types.keys():
+            
+            final_data = []
 
-        raw_data = self.request_data(self.graph_types)
+            raw_data = self.request_data(self.graph_types[type])
 
-        for graph_type in self.graph_types:
-            final_data.append({
-                graph_type: FormatData(raw_data, self.received_data.get('resolution'),
-                                       self.delta, graph_type).__dict__
-            })
-
-        return final_data
+            for graph_type in self.graph_types[type]:
+                final_data.append({
+                    graph_type: FormatData(raw_data, self.received_data.get('resolution'),
+                                           self.delta, graph_type).__dict__
+                })
+            new_data = {
+                'title': type,
+                'data': final_data,
+            }
+            return_data.append(new_data)
+        return return_data
 
     def is_fail(self):
         try:
@@ -165,29 +174,25 @@ class FormatData:
 
 
 class Parameters():
-    def __init__(self, type, resolution):
-        self.values = self.get_type(type, resolution)
+    def __init__(self, resolution):
+        self.values = self.get_groups(resolution)
 
-    def get_type(self, type, resolution):
-        endpoint = "/api/system/manager/parameters"
-        body = {
-            'community': 'sb',
-            'temporal': resolution,
-        }
+    def get_groups(self, resolution):
+        endpoint = '/api/system/manager/system/groupings'
 
         r = requests.get(
             API_URL + endpoint,
-            params=body
+            params=''
         )
 
-        api_response = r.json()
+        all_values = {}
+        for type in r.json()['groups']['SB'][resolution.capitalize()]:
+            params = []
+            for param in r.json()['groups']['SB'][resolution.capitalize()][type]:
+                params.append(param[1])
+            all_values[type] = params
 
-        resolve = []
-        for parameter in api_response:
-            if '_SD' not in parameter and '_MAX' not in parameter and '_MIN' not in parameter and '_HR' not in parameter and '_0' not in parameter and '_1' not in parameter and '_2' not in parameter and api_response.get(parameter).get('type') == type and ('Irradiance' in api_response.get(parameter).get('name')):
-                resolve.append(parameter)
-
-        return resolve
+        return all_values
 
 
 def windrose(request):
@@ -201,10 +206,10 @@ def windrose(request):
         'longitude': body.get('longitude'),
         'format': 'json',
     }
-    
+
     r = requests.get(
         API_URL + endpoint,
         params=received_data
     )
-    
+
     return r.json()

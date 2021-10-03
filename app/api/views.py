@@ -38,7 +38,8 @@ def receive_info_from_front(request):
 
     NasaInfo = request_nasa.NasaInfo(
         received_data, resolution,
-        request_nasa.Parameters('RADIATION', resolution).__dict__
+        #['Solar Fluxes and Related', 'Temperature/Thermal IR Flux', 'DOE/ASHRAE Climate Building', 'Humidity/Precipitation', 'Wind/Pressure']
+        request_nasa.Parameters(resolution).__dict__
     )
 
     if NasaInfo.is_fail():
@@ -46,8 +47,4 @@ def receive_info_from_front(request):
 
     data = NasaInfo.return_data_from_nasa()
 
-    final_data = {
-        'data': data,
-    }
-
-    return JsonResponse(final_data)
+    return JsonResponse({'array': data})
