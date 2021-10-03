@@ -51,9 +51,10 @@ class FormatData:
     
     def format_graph(self, graph_raw):
         parameter = graph_raw.get('properties').get('parameter')
-        self.title = list(parameter.keys())[0]
-        items = list(parameter.get(self.title).values())
-        self.values_units = graph_raw.get('parameters').get(self.title).get('units')
+        key = list(parameter.keys())[0]
+        items = list(parameter.get(key).values())
+        self.values_units = graph_raw.get('parameters').get(key).get('units')
+        self.title = graph_raw.get('parameters').get(key).get('longname')
 
         if self.resolution == 'monthly' or self.resolution == 'yearly':
             anual_avg = []
