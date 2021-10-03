@@ -45,15 +45,18 @@ class FormatData:
     def __init__(self, graph_raw, resolution):
         self.values = []
         self.title = ''
-        self.unit_values = '',
+        self.values_units = '',
         self.resolution = resolution
         self.format_graph(graph_raw)
     
     def format_graph(self, graph_raw):
+        parameter = graph_raw.get('properties').get('parameter')
+        self.title = list(parameter.keys())[0]
+        items = list(parameter.get(self.title).values())
+        self.values_units = graph_raw.get('parameters').get(self.title).get('units')
+
         if self.resolution == 'monthly' or self.resolution == 'yearly':
             anual_avg = []
-            parameter = graph_raw.get('properties').get('parameter')
-            items = list(parameter.get(list(parameter.keys())[0]).values())
             avg_items = len(items) // 13
 
             for i in range(avg_items, 0, -1):
