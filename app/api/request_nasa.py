@@ -50,7 +50,7 @@ class FormatData:
         self.format_graph(graph_raw)
     
     def format_graph(self, graph_raw):
-        if self.resolution == 'monthly' or self.resolution == 'annualy':
+        if self.resolution == 'monthly' or self.resolution == 'yearly':
             anual_avg = []
             parameter = graph_raw.get('properties').get('parameter')
             items = list(parameter.get(list(parameter.keys())[0]).values())
