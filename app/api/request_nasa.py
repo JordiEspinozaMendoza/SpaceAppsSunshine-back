@@ -47,6 +47,14 @@ class NasaInfo:
             now = datetime.now()
 
             if self.api_resolution == 'monthly':
+                if len(start_date) > 4:
+                    self.received_data['start'] = start_date[:4]
+                    start_date = self.received_data['start']
+
+                if len(end_date) > 4:
+                    self.received_data['end'] = end_date[:4]
+                    end_date = self.received_data['end']
+
                 now_year = now.year
 
                 if int(start_date) < 1981 \
