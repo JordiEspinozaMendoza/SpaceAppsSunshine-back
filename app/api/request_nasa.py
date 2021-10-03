@@ -4,6 +4,7 @@ import sys
 
 from datetime import datetime, timedelta
 
+from functools import reduce
 
 API_URL = os.getenv('API_URL')
 
@@ -34,6 +35,7 @@ class NasaInfo:
             formatted_data = {
                 graph_type: FormatData(raw_data,
                                        self.received_data.get('resolution'),
+                                       self.delta,
                                        ).__dict__
             }
             final_data.append(formatted_data)
@@ -65,17 +67,8 @@ class NasaInfo:
                         or int(end_date) >= now_year:
                     return True
             else:
-                start_date_obj = datetime(
-                    year=int(start_date[:4]),
-                    month=int(start_date[4:6]),
-                    day=int(start_date[6:])
-                )
-
-                end_date_obj = datetime(
-                    year=int(end_date[:4]),
-                    month=int(end_date[4:6]),
-                    day=int(end_date[6:])
-                )
+                start_date_obj = datetime.strptime(start_date, '%Y%m%d')
+                end_date_obj = datetime.strptime(end_date, '%Y%m%d')
 
                 if start_date_obj.year < 1981 \
                         or start_date_obj >= now:
@@ -84,6 +77,32 @@ class NasaInfo:
                 if end_date_obj < start_date_obj \
                         or end_date_obj >= now:
                     return True
+
+            if self.received_data.get('resolution') == 'weekly':
+                start_date_obj = datetime.strptime(start_date, '%Y%m%d')
+
+                dt_start = datetime.strptime(start_date, '%Y%m%d')
+                start_start = dt_start - timedelta(days=dt_start.weekday())
+                end_start = start_start + timedelta(days=6)
+
+                if start_date_obj.year != start_start.year:
+                    start_start = datetime(
+                        year=start_date_obj.year, month=1, day=1)
+                real_dt_start = end_start - start_start
+
+                end_date_obj = datetime.strptime(end_date, '%Y%m%d')
+                dt_end = datetime.strptime(end_date, '%Y%m%d')
+                start_end = dt_end - timedelta(days=dt_end.weekday())
+                end_end = start_end + timedelta(days=6)
+
+                if end_date_obj.year != end_end.year:
+                    end_end = datetime(
+                        year=end_date_obj.year, month=12, day=31)
+
+                self.delta = real_dt_start.days
+
+                self.received_data['start'] = start_start.strftime('%Y%m%d')
+                self.received_data['end'] = end_end.strftime('%Y%m%d')
 
         except Exception:
             err = sys.exc_info()
@@ -96,14 +115,14 @@ class NasaInfo:
 
 
 class FormatData:
-    def __init__(self, graph_raw, resolution):
+    def __init__(self, graph_raw, resolution, delta):
         self.values = []
         self.title = ''
         self.values_units = '',
         self.resolution = resolution
-        self.format_graph(graph_raw)
+        self.format_graph(graph_raw, delta)
 
-    def format_graph(self, graph_raw):
+    def format_graph(self, graph_raw, delta):
         parameter = graph_raw.get('properties').get('parameter')
         key = list(parameter.keys())[0]
         items = list(parameter.get(key).values())
@@ -124,6 +143,20 @@ class FormatData:
                 self.values = items
             else:
                 self.values = anual_avg
+
+        elif self.resolution == 'weekly':
+            weekly_avg = [reduce(lambda a, b: a + b,
+                                 items[0:delta])/delta]
+
+            i = delta
+
+            while i < len(items):
+                dt = i+7
+                weekly_avg.append(
+                    reduce(lambda a, b: a + b, items[i:dt])/len(items[i:dt]))
+                i = dt
+
+            self.values = weekly_avg
 
 
 class Parameters():
