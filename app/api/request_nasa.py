@@ -115,7 +115,7 @@ class NasaInfo:
 
 
 class FormatData:
-    def __init__(self, graph_raw, resolution, delta):
+    def __init__(self, graph_raw, resolution, delta=None):
         self.values = []
         self.title = ''
         self.values_units = '',
