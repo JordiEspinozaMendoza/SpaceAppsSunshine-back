@@ -19,14 +19,13 @@ def request_info_nasa(request):
 
 def receive_info_from_front(request):
     body = request.GET
-
     received_data = {
         'start': body.get('start'),
         'end': body.get('end'),
         'latitude': body.get('latitude'),
         'longitude': body.get('longitude'),
         'resolution': body.get('resolution'),
-        'community': 'sb',
+        'community': body.get('comunity'),
         'format': 'json',
     }
 
@@ -38,8 +37,8 @@ def receive_info_from_front(request):
 
     NasaInfo = request_nasa.NasaInfo(
         received_data, resolution,
-        #['Solar Fluxes and Related', 'Temperature/Thermal IR Flux', 'DOE/ASHRAE Climate Building', 'Humidity/Precipitation', 'Wind/Pressure']
-        request_nasa.Parameters(resolution).__dict__
+        
+        request_nasa.Parameters(body.get('comunity').upper(), resolution).__dict__
     )
 
     if NasaInfo.is_fail():

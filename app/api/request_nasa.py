@@ -174,10 +174,10 @@ class FormatData:
 
 
 class Parameters():
-    def __init__(self, resolution):
-        self.values = self.get_groups(resolution)
+    def __init__(self, units, resolution):
+        self.values = self.get_groups(units, resolution)
 
-    def get_groups(self, resolution):
+    def get_groups(self, units, resolution):
         endpoint = '/api/system/manager/system/groupings'
 
         r = requests.get(
@@ -186,9 +186,9 @@ class Parameters():
         )
 
         all_values = {}
-        for type in r.json()['groups']['SB'][resolution.capitalize()]:
+        for type in r.json()['groups'][units][resolution.capitalize()]:
             params = []
-            for param in r.json()['groups']['SB'][resolution.capitalize()][type]:
+            for param in r.json()['groups'][units][resolution.capitalize()][type]:
                 params.append(param[1])
             all_values[type] = params
 
