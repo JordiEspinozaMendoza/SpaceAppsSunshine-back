@@ -30,8 +30,19 @@ def receive_info_from_front(request):
         'format': 'json',
     }
 
-    NasaInfo = request_nasa.NasaInfo(received_data)
+    resolution = received_data.get('resolution')
+    if resolution == 'yearly':
+        resolution = 'monthly'
+    elif resolution == 'weekly':
+        resolution = 'daily'
+
+    NasaInfo = request_nasa.NasaInfo(received_data, resolution)
+
+    if NasaInfo.is_fail():
+        return JsonResponse({'message': 'error'}, status = 500)
+
     data = NasaInfo.return_data_from_nasa()
+    
     final_data = {
         'data': data,
     }
