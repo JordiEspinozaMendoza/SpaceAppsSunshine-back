@@ -1,19 +1,11 @@
-import requests
-import os
-
-from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
 
 from . import request_nasa
 
 
-API_URL = os.getenv('API_URL')
-
-
-@csrf_exempt
 def main_view(request):
     response = {
-        "status": "up and running"
+        "Status": "up and running"
     }
 
     return JsonResponse(response)
@@ -29,20 +21,16 @@ def receive_info_from_front(request):
     endpoint = 'api/temporal/monthly/point'
     body = request.GET
 
-    required = {
+    received_data = {
         'start': body.get('start'),
         'end': body.get('end'),
         'latitude': body.get('latitude'),
         'longitude': body.get('longitude'),
         'community': 'sb',
-        'parameters': 'ALLSKY_SFC_SW_DWN',
+        'format': 'json',
     }
 
-    r = requests.get(
-        API_URL + endpoint,
-        params=required
-    )
+    NasaInfo = request_nasa.NasaInfo(received_data)
+    final_data = NasaInfo.return_data_from_nasa()
 
-    api_response = r.json()
-
-    return JsonResponse(api_response)
+    return JsonResponse(final_data)

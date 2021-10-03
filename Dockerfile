@@ -19,6 +19,3 @@ RUN apt-get update \
     && pip install -r /requirements.txt
 
 COPY ./app /app/
-
-# run gunicorn
-# CMD gunicorn app.wsgi:application --bind 0.0.0.0:$PORT
