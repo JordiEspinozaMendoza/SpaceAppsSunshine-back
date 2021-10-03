@@ -14,6 +14,7 @@ class NasaInfo:
         self.received_data = received_data
         self.api_resolution = api_resolution
         self.graph_types = parameters['values']
+        self.delta = None
 
     def request_data(self, data_type):
         endpoint = f'/api/temporal/{self.api_resolution}/point'
