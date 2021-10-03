@@ -50,13 +50,14 @@ class NasaInfo:
             now = datetime.now()
 
             if self.api_resolution == 'monthly':
-                if len(start_date) > 4:
-                    self.received_data['start'] = start_date[:4]
-                    start_date = self.received_data['start']
 
-                if len(end_date) > 4:
-                    self.received_data['end'] = end_date[:4]
-                    end_date = self.received_data['end']
+                self.received_data['start'] = datetime.strptime(
+                    start_date[:4], '%Y').year
+                start_date = self.received_data['start']
+
+                self.received_data['end'] = datetime.strptime(
+                    end_date[:4], '%Y').year
+                end_date = self.received_data['end']
 
                 now_year = now.year
 
@@ -82,8 +83,8 @@ class NasaInfo:
             if self.received_data.get('resolution') == 'weekly':
                 start_date_obj = datetime.strptime(start_date, '%Y%m%d')
 
-                dt_start = datetime.strptime(start_date, '%Y%m%d')
-                start_start = dt_start - timedelta(days=dt_start.weekday())
+                start_start = start_date_obj - \
+                    timedelta(days=start_date_obj.weekday())
                 end_start = start_start + timedelta(days=6)
 
                 if start_date_obj.year != start_start.year:
@@ -92,8 +93,9 @@ class NasaInfo:
                 real_dt_start = end_start - start_start
 
                 end_date_obj = datetime.strptime(end_date, '%Y%m%d')
-                dt_end = datetime.strptime(end_date, '%Y%m%d')
-                start_end = dt_end - timedelta(days=dt_end.weekday())
+
+                start_end = end_date_obj - \
+                    timedelta(days=end_date_obj.weekday())
                 end_end = start_end + timedelta(days=6)
 
                 if end_date_obj.year != end_end.year:
@@ -116,7 +118,7 @@ class NasaInfo:
 
 
 class FormatData:
-    def __init__(self, graph_raw, resolution, delta=None):
+    def __init__(self, graph_raw, resolution, delta):
         self.values = []
         self.title = ''
         self.values_units = '',
