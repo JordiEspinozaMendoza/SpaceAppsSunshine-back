@@ -19,27 +19,26 @@ class NasaInfo:
     def request_data(self, data_type):
         endpoint = f'/api/temporal/{self.api_resolution}/point'
         body = self.received_data
-        body['parameters'] = data_type
+        body['parameters'] = ','.join(data_type)
 
         r = requests.get(
             API_URL + endpoint,
             params=body
         )
         api_response = r.json()
+
         return api_response
 
     def return_data_from_nasa(self):
         final_data = []
 
+        raw_data = self.request_data(self.graph_types)
+
         for graph_type in self.graph_types:
-            raw_data = self.request_data(graph_type)
-            formatted_data = {
-                graph_type: FormatData(raw_data,
-                                       self.received_data.get('resolution'),
-                                       self.delta,
-                                       ).__dict__
-            }
-            final_data.append(formatted_data)
+            final_data.append({
+                graph_type: FormatData(raw_data, self.received_data.get('resolution'),
+                                       self.delta, graph_type).__dict__
+            })
 
         return final_data
 
@@ -118,16 +117,15 @@ class NasaInfo:
 
 
 class FormatData:
-    def __init__(self, graph_raw, resolution, delta):
+    def __init__(self, graph_raw, resolution, delta, graph_type):
         self.values = []
         self.title = ''
         self.values_units = '',
         self.resolution = resolution
-        self.format_graph(graph_raw, delta)
+        self.format_graph(graph_raw, delta, graph_type)
 
-    def format_graph(self, graph_raw, delta):
+    def format_graph(self, graph_raw, delta, key):
         parameter = graph_raw.get('properties').get('parameter')
-        key = list(parameter.keys())[0]
         items = list(parameter.get(key).values())
         self.values_units = graph_raw.get('parameters').get(key).get('units')
         self.title = graph_raw.get('parameters').get(key).get('longname')
