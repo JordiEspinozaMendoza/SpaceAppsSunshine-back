@@ -60,7 +60,7 @@ class NasaInfo:
 
                 now_year = now.year
 
-                if int(start_date) < 1981 \
+                if int(start_date) < 1984 \
                         or int(start_date) >= now_year:
                     return True
 
@@ -71,7 +71,7 @@ class NasaInfo:
                 start_date_obj = datetime.strptime(start_date, '%Y%m%d')
                 end_date_obj = datetime.strptime(end_date, '%Y%m%d')
 
-                if start_date_obj.year < 1981 \
+                if start_date_obj.year < 1984 \
                         or start_date_obj >= now:
                     return True
 
@@ -154,8 +154,11 @@ class FormatData:
             while i < len(items):
                 dt = i+7
                 result = list(filter(lambda x: x >= 0, items[i:dt]))
-                weekly_avg.append(
-                    reduce(lambda a, b: a + b, result)/len(result))
+                try:
+                    weekly_avg.append(
+                        reduce(lambda a, b: a + b, result)/len(result))
+                except Exception:
+                    weekly_avg.append(-999)
                 i = dt
 
             self.values = weekly_avg
@@ -185,3 +188,23 @@ class Parameters():
                 resolve.append(parameter)
 
         return resolve
+
+
+def windrose(request):
+    endpoint = "/api/application/windrose/point"
+    body = request.GET
+
+    received_data = {
+        'start': body.get('start'),
+        'end': body.get('end'),
+        'latitude': body.get('latitude'),
+        'longitude': body.get('longitude'),
+        'format': 'json',
+    }
+    
+    r = requests.get(
+        API_URL + endpoint,
+        params=received_data
+    )
+    
+    return r.json()

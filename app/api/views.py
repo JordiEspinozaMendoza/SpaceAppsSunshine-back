@@ -12,7 +12,7 @@ def main_view(request):
 
 
 def request_info_nasa(request):
-    json_response = request_nasa.testing(request)
+    json_response = request_nasa.windrose(request)
 
     return JsonResponse(json_response)
 
