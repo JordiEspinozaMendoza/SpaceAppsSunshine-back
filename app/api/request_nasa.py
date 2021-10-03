@@ -44,16 +44,23 @@ class NasaInfo:
 class FormatData:
     def __init__(self, graph_raw, resolution):
         self.values = []
-        self.anual_avg = 0
         self.title = ''
         self.unit_values = '',
         self.resolution = resolution
         self.format_graph(graph_raw)
     
     def format_graph(self, graph_raw):
-        if self.resolution == 'monthly':
+        if self.resolution == 'monthly' or self.resolution == 'annualy':
+            anual_avg = []
             parameter = graph_raw.get('properties').get('parameter')
             items = list(parameter.get(list(parameter.keys())[0]).values())
-            self.anual_avg = items.pop(12)
-            self.values = items
+            avg_items = len(items) // 13
 
+            for i in range(avg_items, 0, -1):
+                anual_avg.append(items.pop(i * 13 - 1))
+            anual_avg.reverse()
+            
+            if self.resolution == 'monthly':
+                self.values = items
+            else:
+                self.values = anual_avg
