@@ -155,8 +155,9 @@ class FormatData:
 
             while i < len(items):
                 dt = i+7
+                result = list(filter(lambda x: x >= 0, items[i:dt]))
                 weekly_avg.append(
-                    reduce(lambda a, b: a + b, items[i:dt])/len(items[i:dt]))
+                    reduce(lambda a, b: a + b, result)/len(result))
                 i = dt
 
             self.values = weekly_avg
