@@ -15,7 +15,7 @@ class NasaInfo:
         self.graph_types = ['ALLSKY_SFC_SW_DWN', 'ALLSKY_SFC_SW_DWN']
 
     def request_data(self, data_type):
-        endpoint = f'api/temporal/{self.api_resolution}/point'
+        endpoint = f'/api/temporal/{self.api_resolution}/point'
         body = self.received_data
         body['parameters'] = data_type
 
@@ -118,3 +118,30 @@ class FormatData:
                 self.values = items
             else:
                 self.values = anual_avg
+
+
+class Parameters():
+    def __init__(self, type, resolution):
+        self.values = self.get_type(type, resolution)
+
+    def get_type(self, type, resolution):
+        endpoint = "/api/system/manager/parameters"
+        body = {
+            'community': 'sb',
+            'temporal': resolution,
+        }
+        print(API_URL + endpoint)
+        r = requests.get(
+            API_URL + endpoint,
+            params=body
+        )
+
+        api_response = r.json()
+
+        resolve = []
+        for parameter in api_response:
+            print(parameter)
+            if api_response.get(parameter).get('type') == type:
+                resolve.append(parameter)
+
+        return resolve
