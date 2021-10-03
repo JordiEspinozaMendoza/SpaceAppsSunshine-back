@@ -32,7 +32,9 @@ class NasaInfo:
         for graph_type in self.graph_types:
             raw_data = self.request_data(graph_type)
             formatted_data = {
-                graph_type: FormatData(raw_data).__dict__
+                graph_type: FormatData(raw_data,
+                self.received_data.get('resolution'),
+            ).__dict__
             }
             final_data.append(formatted_data)
         
@@ -40,8 +42,13 @@ class NasaInfo:
 
 
 class FormatData:
-    def __init__(self, graph_raw):
-        self.monthly_values = []
+    def __init__(self, graph_raw, resolution):
+        self.values = []
         self.anual_avg = 0
         self.title = ''
-        self.unit_values = ''
+        self.unit_values = '',
+        self.resolution = resolution
+        self.format_graph(graph_raw)
+    
+    def format_graph(self, graph_raw):
+        pass

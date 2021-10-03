@@ -25,6 +25,7 @@ def receive_info_from_front(request):
         'end': body.get('end'),
         'latitude': body.get('latitude'),
         'longitude': body.get('longitude'),
+        'resolution': body.get('resolution'),
         'community': 'sb',
         'format': 'json',
     }
